@@ -12,9 +12,12 @@ app.use(express.urlencoded({ extended: false }));
 //routes
 const StoreRouter = require("./routes/store.route");
 const UserRouter = require("./routes/user.route");
+const ProductRouter = require("./routes/product.route");
+
 //use routes
 app.use(StoreRouter);
 app.use(UserRouter);
+app.use(ProductRouter);
 
 //authentication
 config
