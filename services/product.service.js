@@ -29,19 +29,15 @@ class ProductService extends Response {
     try {
       let exist = await Product.findOne({
         where: { id: productID },
-        include: [{ model: Store, as: "store_info" }],
+        include: { model: Store, as: "store_info" },
       });
-      if (exist != null) {
-        return this.RESPONSE(OK, exist, OK_MESSAGE);
+      if (exist.length != 0) {
+        return this.RESPONSE(200, exist, "Success!");
       } else {
-        return this.RESPONSE(NOTFOUND, {}, NOTFOUND_MESSAGE);
+        return this.RESPONSE(404, [], "No Record Found!");
       }
-    } catch (err) {
-      return this.RESPONSE(
-        INTERNAL_SERVER_ERROR,
-        err,
-        INTERNAL_SERVER_ERROR_MESSAGE
-      );
+    } catch (error) {
+      return this.RESPONSE(500, {}, "Internal Server Error");
     }
   }
 
@@ -50,19 +46,78 @@ class ProductService extends Response {
       let exist = await Product.findAll({
         offset: offset,
         limit: limit,
-        order: [[sort, order]],
+        order: sort[order],
       });
       if (exist.length != 0) {
-        return this.RESPONSE(OK, exist, OK_MESSAGE);
+        return this.RESPONSE(200, exist, "Success!");
       } else {
-        return this.RESPONSE(NOTFOUND, [], NOTFOUND_MESSAGE);
+        return this.RESPONSE(404, [], "No Record Found!");
       }
-    } catch (err) {
-      return this.RESPONSE(
-        INTERNAL_SERVER_ERROR,
-        err,
-        INTERNAL_SERVER_ERROR_MESSAGE
-      );
+    } catch (error) {
+      return this.RESPONSE(500, {}, "Internal Server Error");
+    }
+  }
+
+  //create product
+  async createProduct(requestObject) {
+    try {
+      let exist = await Product.findOne({
+        where: { name: requestObject.name },
+      });
+      if (exist == null) {
+        let createData = await Product.create(requestObject);
+        if (createData !== null) {
+          return this.RESPONSE(200, createData, "Product created successfully");
+        } else {
+          return this.RESPONSE(400, {}, "Failed to create product");
+        }
+      } else {
+        return this.RESPONSE(200, exist, "Product already exist");
+      }
+    } catch (error) {
+      return this.RESPONSE(500, {}, "Internal Server Error");
+    }
+  }
+
+  //update product
+  async updateProduct(requestObject) {
+    try {
+      let exist = await Product.findOne({ where: { id: requestObject.id } });
+      if (exist != null) {
+        let updateData = await Product.update(requestObject, {
+          where: { id: requestObject.id },
+        });
+        if (updateData != null) {
+          return this.RESPONSE(202, updateData, "Product update successfully");
+        } else {
+          return this.RESPONSE(400, {}, "Failed to update product");
+        }
+      } else {
+        return this.RESPONSE(404, {}, "Product not found");
+      }
+    } catch (error) {
+      return this.RESPONSE(500, {}, "Internal Server Error");
+    }
+  }
+
+  //delete product
+  async deleteProduct(requestObject) {
+    try {
+      let exist = await Product.findOne({ where: { id: requestObject } });
+      if (exist != null) {
+        let removeData = await Product.destroy({
+          where: { id: requestObject },
+        });
+        if (removeData != null) {
+          return this.RESPONSE(200, {}, "Product deleted successfully");
+        } else {
+          return this.RESPONSE(400, {}, "Failed to delete product");
+        }
+      } else {
+        return this.RESPONSE(404, {}, "Product not found");
+      }
+    } catch (error) {
+      return this.RESPONSE(500, {}, "Internal Server Error");
     }
   }
 }

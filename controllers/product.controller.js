@@ -36,6 +36,20 @@ class ProductController {
     );
     return response;
   }
+
+  async createProduct(requestObject) {
+    let response = await ProductService.createProduct(requestObject);
+    return response;
+  }
+
+  async updateProduct(requestObject) {
+    let response = await ProductService.updateProduct(requestObject);
+    return response;
+  }
+  async deleteProduct(requestObject) {
+    let response = await ProductService.deleteProduct(requestObject);
+    return response;
+  }
 }
 
 module.exports = new ProductController();
